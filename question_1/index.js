@@ -3,12 +3,12 @@ const express = require('express');
 const axios = require('axios');
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 
-const BEARER_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiZXhwIjoxNzQzODM0MDI3LCJpYXQiOjE3NDM4MzM3MjcsImlzcyI6IkFmZm9yZG1lZCIsImp0aSI6ImU3YzE3Y2I1LWVhYzEtNDZhZi1hYTU3LTFkZjMyNjQ1ODc3NyIsInN1YiI6InNvbmlhdmlyYWwxNEBnbWFpbC5jb20ifSwiZW1haWwiOiJzb25pYXZpcmFsMTRAZ21haWwuY29tIiwibmFtZSI6ImF2aXJhbCBzb25pIiwicm9sbE5vIjoiMjE4MDMwMjEiLCJhY2Nlc3NDb2RlIjoiU3JNUXFSIiwiY2xpZW50SUQiOiJlN2MxN2NiNS1lYWMxLTQ2YWYtYWE1Ny0xZGYzMjY0NTg3NzciLCJjbGllbnRTZWNyZXQiOiJNWFlRS3JtTmNjeHVtcUFSIn0.iSXxWw-bxnSnF8_jEccnZUMSUVUycLVOiksU1iwaN3o';
+const BEARER_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiZXhwIjoxNzQzODM4ODE3LCJpYXQiOjE3NDM4Mzg1MTcsImlzcyI6IkFmZm9yZG1lZCIsImp0aSI6ImU3YzE3Y2I1LWVhYzEtNDZhZi1hYTU3LTFkZjMyNjQ1ODc3NyIsInN1YiI6InNvbmlhdmlyYWwxNEBnbWFpbC5jb20ifSwiZW1haWwiOiJzb25pYXZpcmFsMTRAZ21haWwuY29tIiwibmFtZSI6ImF2aXJhbCBzb25pIiwicm9sbE5vIjoiMjE4MDMwMjEiLCJhY2Nlc3NDb2RlIjoiU3JNUXFSIiwiY2xpZW50SUQiOiJlN2MxN2NiNS1lYWMxLTQ2YWYtYWE1Ny0xZGYzMjY0NTg3NzciLCJjbGllbnRTZWNyZXQiOiJNWFlRS3JtTmNjeHVtcUFSIn0.fmb4Bkxri_vXcdi0XsmVBdZCjEYiAUunHQww7XvcdHw';
 
 const BASE_URL = 'http://20.244.56.144/evaluation-service';
-const COMMENTS_BASE_URL = 'http://28.244.56.144/evaluation-service';
+const COMMENTS_BASE_URL = 'http://20.244.56.144/evaluation-service';
 
 // i am assuming i can use 60 seconds as the cache time to live (TTL) for the cache
 // Cache implementation
