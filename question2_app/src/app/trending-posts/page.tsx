@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+"use client "
 import Navbar from "../../../components/Navbar";
 import PostCard from "../../../components/PostCard";
 import { fetchTrendingPosts } from "../../../lib/api";
