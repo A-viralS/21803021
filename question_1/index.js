@@ -4,14 +4,14 @@ const axios = require('axios');
 
 const app = express();
 const PORT = 3000;
-const BEARER_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiZXhwIjoxNzQzODM0MDI3LCJpYXQiOjE3NDM4MzM3MjcsImlzcyI6IkFmZm9yZG1lZCIsImp0aSI6ImU3YzE3Y2I1LWVhYzEtNDZhZi1hYTU3LTFkZjMyNjQ1ODc3NyIsInN1YiI6InNvbmlhdmlyYWwxNEBnbWFpbC5jb20ifSwiZW1haWwiOiJzb25pYXZpcmFsMTRAZ21haWwuY29tIiwibmFtZSI6ImF2aXJhbCBzb25pIiwicm9sbE5vIjoiMjE4MDMwMjEiLCJhY2Nlc3NDb2RlIjoiU3JNUXFSIiwiY2xpZW50SUQiOiJlN2MxN2NiNS1lYWMxLTQ2YWYtYWE1Ny0xZGYzMjY0NTg3NzciLCJjbGllbnRTZWNyZXQiOiJNWFlRS3JtTmNjeHVtcUFSIn0.iSXxWw-bxnSnF8_jEccnZUMSUVUycLVOiksU1iwaN3o';
 
+const BEARER_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiZXhwIjoxNzQzODM0MDI3LCJpYXQiOjE3NDM4MzM3MjcsImlzcyI6IkFmZm9yZG1lZCIsImp0aSI6ImU3YzE3Y2I1LWVhYzEtNDZhZi1hYTU3LTFkZjMyNjQ1ODc3NyIsInN1YiI6InNvbmlhdmlyYWwxNEBnbWFpbC5jb20ifSwiZW1haWwiOiJzb25pYXZpcmFsMTRAZ21haWwuY29tIiwibmFtZSI6ImF2aXJhbCBzb25pIiwicm9sbE5vIjoiMjE4MDMwMjEiLCJhY2Nlc3NDb2RlIjoiU3JNUXFSIiwiY2xpZW50SUQiOiJlN2MxN2NiNS1lYWMxLTQ2YWYtYWE1Ny0xZGYzMjY0NTg3NzciLCJjbGllbnRTZWNyZXQiOiJNWFlRS3JtTmNjeHVtcUFSIn0.iSXxWw-bxnSnF8_jEccnZUMSUVUycLVOiksU1iwaN3o';
 
 const BASE_URL = 'http://20.244.56.144/evaluation-service';
 const COMMENTS_BASE_URL = 'http://28.244.56.144/evaluation-service';
 
-// assuming i can use 60 seconds as the cache time to live (TTL)
-//cachde implementation
+// i am assuming i can use 60 seconds as the cache time to live (TTL) for the cache
+// Cache implementation
 const cache = new Map();
 function setCache(key, data) {
   cache.set(key, { data, timestamp: Date.now() });
@@ -30,21 +30,22 @@ app.get('/users', async (req, res) => {
     const cached = getCache('topUsers');
     if (cached) return res.json(cached);
 
-    const usersResponse = await axios.get(`${BASE_URL}/users`,{
-        headers: {
-           Authorization:`Bearer ${BEARER_TOKEN}`,
-        },
+    const usersResponse = await axios.get(`${BASE_URL}/users`, {
+      headers: {
+        Authorization: `Bearer ${BEARER_TOKEN}`,
+      },
     });
+
     const users = usersResponse.data.users;
     const userPostCounts = [];
 
     const userIds = Object.keys(users);
 
     const fetchPosts = userIds.map(async (id) => {
-      const response = await axios.get(`${BASE_URL}/users/${id}/posts`,{
+      const response = await axios.get(`${BASE_URL}/users/${id}/posts`, {
         headers: {
           Authorization: `Bearer ${BEARER_TOKEN}`,
-        }
+        },
       });
       const count = response.data.posts.length;
       userPostCounts.push({ id, name: users[id], count });
@@ -71,14 +72,23 @@ app.get('/posts', async (req, res) => {
   }
 
   try {
-    const usersResponse = await axios.get(`${BASE_URL}/users`);
+    const usersResponse = await axios.get(`${BASE_URL}/users`, {
+      headers: {
+        Authorization: `Bearer ${BEARER_TOKEN}`,
+      },
+    });
+
     const users = usersResponse.data.users;
     const userIds = Object.keys(users);
 
     const allPosts = [];
 
     const fetchPosts = userIds.map(async (id) => {
-      const response = await axios.get(`${BASE_URL}/users/${id}/posts`);
+      const response = await axios.get(`${BASE_URL}/users/${id}/posts`, {
+        headers: {
+          Authorization: `Bearer ${BEARER_TOKEN}`,
+        },
+      });
       allPosts.push(...response.data.posts);
     });
 
@@ -86,22 +96,26 @@ app.get('/posts', async (req, res) => {
 
     if (type === 'latest') {
       const latestPosts = allPosts
-        .sort((a, b) => b.id - a.id) // assuming higher ID means newer
+        .sort((a, b) => b.id - a.id)
         .slice(0, 5);
       return res.json(latestPosts);
     } else {
       const postCommentCounts = [];
 
       const fetchComments = allPosts.map(async (post) => {
-        const response = await axios.get(`${COMMENTS_BASE_URL}/posts/${post.id}/comments`);
+        const response = await axios.get(`${COMMENTS_BASE_URL}/posts/${post.id}/comments`, {
+          headers: {
+            Authorization: `Bearer ${BEARER_TOKEN}`,
+          },
+        });
         const count = response.data.comments.length;
         postCommentCounts.push({ ...post, commentCount: count });
       });
 
       await Promise.all(fetchComments);
 
-      const maxCount = Math.max(...postCommentCounts.map(p => p.commentCount));
-      const popularPosts = postCommentCounts.filter(p => p.commentCount === maxCount);
+      const maxCount = Math.max(...postCommentCounts.map((p) => p.commentCount));
+      const popularPosts = postCommentCounts.filter((p) => p.commentCount === maxCount);
 
       return res.json(popularPosts);
     }
